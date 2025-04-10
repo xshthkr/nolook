@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99 -O2
 INCLUDE = -Iinclude
 
-SRC = src/main.c src/utils.c
+SRC = src/main.c src/utils.c src/zkp.c
 OBJ = $(patsubst src/%.c, build/%.o, $(SRC))
 TARGET = bin/nolook
 
