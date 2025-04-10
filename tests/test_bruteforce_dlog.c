@@ -23,4 +23,5 @@ int main () {
         assert(x == 71);
 
         printf("All tests passed.\n");
+        return 0;
 }
