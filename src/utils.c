@@ -1,6 +1,9 @@
 #include <utils.h>
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <openssl/sha.h>
 
 uint64_t modexp(uint64_t base, uint64_t exp, uint64_t mod) {
@@ -63,4 +66,27 @@ uint64_t bruteforce_dlog(uint64_t g, uint64_t y, uint64_t p) {
         }
 
         return -1;
+}
+
+uint8_t* sha256(const uint8_t* data, size_t len) {
+        uint8_t* hash = malloc(SHA256_DIGEST_LENGTH);
+        if (hash == NULL) {
+                perror("Failed to allocate memory for SHA256 hash");
+                exit(EXIT_FAILURE);
+        }
+        memset(hash, 0, SHA256_DIGEST_LENGTH);
+
+        SHA256(data, len, hash);
+
+        return hash;
+}
+
+uint64_t sha256_uint64(const uint8_t* data, size_t len) {
+        uint8_t* hash = sha256(data, len);
+        uint64_t result = 0;
+        for (uint64_t i = 0; i < sizeof(uint64_t); i++) {
+                result |= ((uint64_t)hash[i]) << (8 * (sizeof(uint64_t) - 1 - i));
+        }
+        free(hash);
+        return result;
 }
