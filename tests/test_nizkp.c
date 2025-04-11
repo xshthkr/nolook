@@ -52,6 +52,11 @@ int main () {
         // he checks the following equation
         // g^s mod p == t * y^c mod p
         uint64_t c = zkp_hash(&params, alice.y, alice.t) % params.q;
+        // tampering to test
+        // c = (c + 1) % params.q;
+        // alice.y = (alice.y + 1) % params.p;
+        // alice.t = (alice.t + 1) % params.p;
+        // alice.s = (alice.s + 1) % params.q;
         uint8_t result = zkp_verify(&params, alice.y, alice.t, c, alice.s);
 
         assert(result == 1);
