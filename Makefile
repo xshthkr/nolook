@@ -5,6 +5,7 @@ INCLUDE = -Iinclude
 SRC = src/main.c src/utils.c src/zkp.c
 OBJ = $(patsubst src/%.c, build/%.o, $(SRC))
 TARGET = bin/nolook
+LIB = -lssl -lcrypto
 
 TEST_DIR = tests
 TEST_SRC = $(wildcard $(TEST_DIR)/*.c)
