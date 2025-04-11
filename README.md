@@ -26,7 +26,7 @@ The binary will be in the `bin` directory.
 ```
 
 > [!CAUTION]
-> There is a suspected bug where overflow causes the verification to yield invalid. Will be fixing that soon.
+> There is a suspected bug where an overflow causes the verification to yield invalid. Will be fixing that soon.
 
 ## Technical Details
 
