@@ -8,7 +8,7 @@
 int main () {
 
         zkp_alice_t alice;
-        zkp_params_t params = zkp_init_params(23, 11, 2);
+        zkp_params_t params = zkp_init_params(467, 233, 2);
         zkp_init_alice(&alice, &params);
 
         // zkp_print_params(&params);
@@ -18,7 +18,7 @@ int main () {
         // alice picks secret x in Zq
         // she computes y = g^x mod p
         // she shares p, q, g, y publicly
-        alice.x = 6; // private key
+        alice.x = 123; // private key
         alice.y = zkp_gen_publickey(&params, alice.x); // public key
 
         // printf("\nstep 0: alice generates public key\n");
@@ -59,6 +59,10 @@ int main () {
         // alice.s = (alice.s + 1) % params.q;
         uint8_t result = zkp_verify(&params, alice.y, alice.t, c, alice.s);
 
+        zkp_print_alice(&alice);
+        printf("Verifier's c: %lu\n", c);
+        printf("Result: %s\n", result ? "Valid" : "Invalid");
+        fflush(stdout);
         assert(result == 1);
         printf("All tests passed.\n");
         return 0;
