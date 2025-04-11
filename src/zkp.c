@@ -55,12 +55,12 @@ uint64_t zkp_random(uint64_t lower, uint64_t upper) {
 }
 
 uint64_t zkp_gen_response(zkp_params_t* params, uint64_t r, uint64_t c, uint64_t x) {
-        return (r + c * x) % params->q;
+        return (r + ((c * x) % params->q)) % params->q;
 }
 
 uint8_t zkp_verify(zkp_params_t* params, uint64_t y, uint64_t t, uint64_t c, uint64_t s) {
         uint64_t left = modexp(params->g, s, params->p);
-        uint64_t right = (t * modexp(y, c, params->p)) % params->p;
+        uint64_t right = modmul(t, modexp(y, c, params->p), params->p);
         return left == right;
 }
 
@@ -101,15 +101,40 @@ void zkp_init_bob(zkp_bob_t* bob, zkp_params_t* params) {
 }
 
 uint64_t zkp_hash(zkp_params_t* params, uint64_t y, uint64_t t) {
-        uint8_t* stream = malloc(3 * sizeof(uint64_t));
+
+        // hash with domain separation
+        // stream = "zkp|" + params->g + "|" + y + "|" + t
+
+        size_t stream_size = 3 * sizeof(uint64_t) + 6 * sizeof(uint8_t);
+        uint8_t* stream = malloc(stream_size);
         if (stream == NULL) {
-                perror("Failed to allocate memory for hash stream");
+                perror("Failed to allocate memory for stream");
                 exit(EXIT_FAILURE);
         }
+        size_t offset = 0;
 
-        memcpy(stream, &params->g, sizeof(uint64_t));
-        memcpy(stream + sizeof(uint64_t), &y, sizeof(uint64_t));
-        memcpy(stream + 2 * sizeof(uint64_t), &t, sizeof(uint64_t));
+        const char* prefix = "zkp|";
+        size_t prefix_len = 4 * sizeof(uint8_t);
+        memcpy(stream + offset, prefix, prefix_len);
+        offset += prefix_len;
+
+        const char* separator = "|";
+        size_t separator_len = sizeof(uint8_t);
+
+        memcpy(stream + offset, &params->g, sizeof(uint64_t));
+        offset += sizeof(uint64_t);
+
+        memcpy(stream + offset, separator, separator_len);
+        offset += separator_len;
+
+        memcpy(stream + offset, &y, sizeof(uint64_t));
+        offset += sizeof(uint64_t);
+
+        memcpy(stream + offset, separator, separator_len);
+        offset += separator_len;
+
+        memcpy(stream + offset, &t, sizeof(uint64_t));
+        offset += sizeof(uint64_t);
 
         uint64_t hash = sha256_uint64(stream, 3 * sizeof(uint64_t));
         free(stream);
