@@ -11,7 +11,7 @@ typedef struct {
 
 typedef struct {
         uint64_t x, y;
-        uint64_t r, t, s;
+        uint64_t r, t, s, c;
         zkp_params_t* params;
 } zkp_alice_t;
 
@@ -30,6 +30,7 @@ void            zkp_print_bob(zkp_bob_t* bob);
 uint64_t        zkp_gen_publickey(zkp_params_t* params, uint64_t x);
 uint64_t        zkp_gen_commitment(zkp_params_t* params, uint64_t r);
 uint64_t        zkp_random(uint64_t min, uint64_t max);
+uint64_t        zkp_hash(zkp_params_t* params, uint64_t y, uint64_t t);
 uint64_t        zkp_gen_response(zkp_params_t* params, uint64_t r, uint64_t c, uint64_t x);
 uint8_t         zkp_verify(zkp_params_t* params, uint64_t y, uint64_t t, uint64_t c, uint64_t s);
 

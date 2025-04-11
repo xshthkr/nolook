@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
+#include <string.h>
 #include <stdio.h>
 
 zkp_params_t zkp_init_params(uint64_t p, uint64_t q, uint64_t g) {
@@ -75,6 +76,7 @@ void zkp_print_alice(zkp_alice_t* alice) {
         printf("Alice's random value (r): %lu\n", alice->r);
         printf("Alice's commitment (t): %lu\n", alice->t);
         printf("Alice's response (s): %lu\n", alice->s);
+        printf("Alice's challenge niZKP (c): %lu\n", alice->c);
 }
 
 void zkp_print_bob(zkp_bob_t* bob) {
@@ -86,6 +88,7 @@ void zkp_init_alice(zkp_alice_t* alice, zkp_params_t* params) {
         alice->params = params;
         alice->x = 0;
         alice->y = 0;
+        alice->c = 0;
         alice->r = 0;
         alice->t = 0;
         alice->s = 0;
@@ -95,4 +98,20 @@ void zkp_init_bob(zkp_bob_t* bob, zkp_params_t* params) {
         bob->params = params;
         bob->c = 0;
         bob->result = 0;
+}
+
+uint64_t zkp_hash(zkp_params_t* params, uint64_t y, uint64_t t) {
+        uint8_t* stream = malloc(3 * sizeof(uint64_t));
+        if (stream == NULL) {
+                perror("Failed to allocate memory for hash stream");
+                exit(EXIT_FAILURE);
+        }
+
+        memcpy(stream, &params->g, sizeof(uint64_t));
+        memcpy(stream + sizeof(uint64_t), &y, sizeof(uint64_t));
+        memcpy(stream + 2 * sizeof(uint64_t), &t, sizeof(uint64_t));
+
+        uint64_t hash = sha256_uint64(stream, 3 * sizeof(uint64_t));
+        free(stream);
+        return hash;       
 }
