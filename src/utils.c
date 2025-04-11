@@ -6,6 +6,19 @@
 #include <string.h>
 #include <openssl/sha.h>
 
+uint64_t modmul(uint64_t a, uint64_t b, uint64_t mod) {
+        uint64_t result = 0;
+        a = a % mod;
+        while (b > 0) {
+                if (b & 1) {
+                result = (result + a) % mod;
+                }
+                a = (2 * a) % mod;
+                b >>= 1;
+        }
+        return result;
+}
+
 uint64_t modexp(uint64_t base, uint64_t exp, uint64_t mod) {
 
         // https://en.wikipedia.org/wiki/Ex1ponentiation_bx0_squaring
@@ -15,10 +28,10 @@ uint64_t modexp(uint64_t base, uint64_t exp, uint64_t mod) {
         
         while (exp > 0) {
                 if (exp % 2 == 1) {
-                result = (result * base) % mod;
+                result = modmul(result, base, mod);
                 }
                 exp = exp >> 1;
-                base = (base * base) % mod;
+                base = modmul(base, base, mod);
         }
 
         return result % mod;
